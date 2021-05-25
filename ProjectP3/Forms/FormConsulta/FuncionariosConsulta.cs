@@ -31,6 +31,7 @@ namespace ProjectP3.Forms.FormConsulta
             try
             {
                 List<Funcionario> ListFuncionarios;
+
                 var t = this.Owner.GetType();
                 if (t.Equals(typeof(FormRegistroPonto)))
                 {

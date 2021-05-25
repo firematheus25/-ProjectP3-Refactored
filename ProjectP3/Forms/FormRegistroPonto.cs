@@ -8,7 +8,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using Humanizer;
 using ProjectP3.Services;
 using ProjectP3.Others;
 using ProjectP3.MDI;
@@ -214,10 +213,7 @@ namespace ProjectP3
             frmConsulta.ShowDialog();
         }
 
-        private void FuncionariosId_ConsultarAPI(object sender)
-        {
-
-        }
+        private void FuncionariosId_ConsultarAPI(object sender){  }
 
         private async void btn_Buscar_Click(object sender, EventArgs e)
         {

@@ -31,6 +31,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Annotations, Version=4.2.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.ComponentModel.Annotations.5.0.0\lib\net461\System.ComponentModel.Annotations.dll</HintPath>
@@ -47,10 +50,14 @@
   <ItemGroup>
     <Compile Include="Models\AgendaPagamento.cs" />
     <Compile Include="Models\Assalariado.cs" />
+    <Compile Include="Models\Command\ConsultaComissionado.cs" />
+    <Compile Include="Models\Command\ConsultaFuncionario.cs" />
+    <Compile Include="Models\Command\ConsultaHorista.cs" />
     <Compile Include="Models\Folha.cs" />
     <Compile Include="Models\FolhaEspelho.cs" />
     <Compile Include="Models\FuncionarioSindical.cs" />
     <Compile Include="Models\FuncionarioVw.cs" />
+    <Compile Include="Models\Command\IConsultaFuncionario.cs" />
     <Compile Include="Models\RegistroPonto.cs" />
     <Compile Include="Models\Cheque.cs" />
     <Compile Include="Models\Comissionado.cs" />
