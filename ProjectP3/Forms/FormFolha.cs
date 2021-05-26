@@ -78,9 +78,6 @@ namespace ProjectP3.Forms
                 if (DtPagamento.Date.Value.DayOfWeek.ToString() == "Saturday") { DIASEMANA = "Sábado"; }
 
 
-
-
-
                 var ultimoDiaDoMes = new DateTime(DtPagamento.Date.Value.Year, DtPagamento.Date.Value.Month, DateTime.DaysInMonth(DtPagamento.Date.Value.Year, DtPagamento.Date.Value.Month));
 
 
@@ -98,27 +95,27 @@ namespace ProjectP3.Forms
 
                 for (int i = 0; i < Funcionario.Count; i++)
                 {
+                    var X = Funcionario[i];
+                    double? salario = 0;
+
                     if (Funcionario[i].Agenda == "Mensal $")
                     {
                         Funcionario[i].Dia = ultimoDiaDoMes.Day.ToString();
                     }
 
 
-
-
                     var TaxaServicoSindical = await new Services<TaxasServico>().GetByIds("api/TaxasServico/Ids", Funcionario[i].FuncionarioSindicalId.ToString());
+
                     if (Funcionario[i].TipoAgenda == "Mensal") //MENSAL
                     {
 
                         if (Funcionario[i].Dia == DtPagamento.Date.Value.Day.ToString())
                         {
 
-
                             if (Funcionario[i].TipoFuncionario == 1) //Assalariado
-                            {
-                                var X = Funcionario[i];
+                            {                                
 
-                                double? salario = X.Salario;
+                                salario = X.Salario;
 
                                 if (!string.IsNullOrEmpty(Funcionario[i].SindicatosId.ToString()))
                                 {
@@ -126,69 +123,20 @@ namespace ProjectP3.Forms
                                     salario = salario - taxa;
                                 }
 
-                                if (TaxaServicoSindical != null)
-                                {
-                                    if (TaxaServicoSindical.Count > 0)
-                                    {
-                                        for (int n = 0; n < TaxaServicoSindical.Count; n++)
-                                        {
-                                            if (TaxaServicoSindical[n].Competencia.Month == DtPagamento.Date.Value.Month)
-                                            {
-                                                salario = salario - TaxaServicoSindical[n].TaxaServico;
-                                            }
-                                        }
-                                    }
-
-                                }
-
-
-                                var folha = new Folha();
-                                folha.FuncionariosId = X.FuncionariosId;
-                                folha.Nome = X.Nome;
-                                if (X.MetodoPagamento == 1)
-                                {
-                                    folha.MetodoPagamento = "Cheque pelos correios";
-                                }
-                                if (X.MetodoPagamento == 2)
-                                {
-                                    folha.MetodoPagamento = "Cheque em mãos";
-                                }
-                                if (X.MetodoPagamento == 3)
-                                {
-                                    folha.MetodoPagamento = "Deposito em conta bancária";
-                                }
-                                folha.DtPagamento = DtPagamento.Date.Value;
-                                folha.Salario = Math.Round((double)salario, 2);
-
-                                ListFolha.Add(folha);
+                                salario = CalcTaxaServico(TaxaServicoSindical, (double)salario, ultimoDiaDoMes, ultimoDiaDoMes.Day);
                             }
 
 
-
                             if (Funcionario[i].TipoFuncionario == 2) // Comissionado
-                            {
-                                double? salario = 0;
-
-                                var X = Funcionario[i];
+                            {                                
+                               
                                 if (!string.IsNullOrEmpty(Funcionario[i].SindicatosId.ToString()))
                                 {
                                     var taxa = Funcionario[i].TaxaSindical;
                                     salario = X.SalarioComissao - taxa;
                                 }
 
-                                if (TaxaServicoSindical != null)
-                                {
-                                    if (TaxaServicoSindical.Count > 0)
-                                    {
-                                        for (int n = 0; n < TaxaServicoSindical.Count; n++)
-                                        {
-                                            if (TaxaServicoSindical[n].Competencia.Month == DtPagamento.Date.Value.Month)
-                                            {
-                                                salario = salario - TaxaServicoSindical[n].TaxaServico;
-                                            }
-                                        }
-                                    }
-                                }
+                                salario = CalcTaxaServico(TaxaServicoSindical, (double)salario, ultimoDiaDoMes, ultimoDiaDoMes.Day);
 
 
                                 var vendas = await new Services<Vendas>().GetByIds("api/Vendas/Ids", Funcionario[i].FuncionariosId.ToString());
@@ -203,117 +151,25 @@ namespace ProjectP3.Forms
                                         }
                                     }
                                 }
-
-
-                                var folha = new Folha();
-                                folha.FuncionariosId = X.FuncionariosId;
-                                folha.Nome = X.Nome;
-                                if (X.MetodoPagamento == 1)
-                                {
-                                    folha.MetodoPagamento = "Cheque pelos correios";
-                                }
-                                if (X.MetodoPagamento == 2)
-                                {
-                                    folha.MetodoPagamento = "Cheque em mãos";
-                                }
-                                if (X.MetodoPagamento == 3)
-                                {
-                                    folha.MetodoPagamento = "Deposito em conta bancária";
-                                }
-                                folha.DtPagamento = DtPagamento.Date.Value;
-                                folha.Salario = Math.Round((double)salario, 2);
-
-                                ListFolha.Add(folha);
-
                             }
-
 
 
                             if (Funcionario[i].TipoFuncionario == 3) //Horista
                             {
                                 var RegistroPontos = await new Services<RegistroPonto>().GetByIds("api/RegistroPontos/Ids", Funcionario[i].FuncionariosId.ToString());
-                                double? salarioHorista = 0;
-                                var Z = Funcionario[i];
+                                salario = 0;
 
-                                for (int j = 0; j < RegistroPontos.Count; j++)
-                                {
-                                    var Y = RegistroPontos[j];
-
-                                    if (Y.DtPonto.Value.Date > DataMes.Date && Y.DtPonto.Value.Date <= DtPagamento.Date)
-                                    {
-                                        var HS = Convert.ToDateTime(Y.Horas);
-                                        TimeSpan padrao = new TimeSpan(08, 00, 00);
-
-                                        var Horas = HS.Hour;
-                                        var Minuto = HS.Minute;
-                                        var ValorMin = (HS.Minute * 1.666667) / 100;
-                                        var ValorMinu = Z.ValorHora * ValorMin;
-                                        var ValorMinConvertido = Math.Round((double)ValorMinu, 2);
-
-                                        var HoraExtra = HS.TimeOfDay - padrao; // Quantidade de Horas/Minutos Extras
-                                        var Horacalc = HoraExtra.Hours;        // Quantidade de Horas Extras
-                                        var Mincalc = (HoraExtra.Minutes * 1.666667) / 100; // Quantidade de Minutos Extras
-                                        var TaxaExtra = ((double)(Z.ValorHora * 1.5)); // Valor Taxa Extra
-                                        var Min = TaxaExtra * Mincalc; // Valor Minutos Extras
-                                        var MinExtra = Math.Round(Min, 2); // Valor Minutos Extras - Duas casas Decimais
-
-                                        if (HS.TimeOfDay > padrao)
-                                        {
-
-                                            salarioHorista += (Z.ValorHora * padrao.Hours) + (TaxaExtra * Horacalc) + MinExtra;
-                                        }
-                                        else
-                                        {
-                                            salarioHorista += (Z.ValorHora * Horas) + ValorMinConvertido;
-                                        }
-                                    }
-                                }
+                                salario = CalcHoras(RegistroPontos, salario, X, 0, DataMes);
 
                                 if (!string.IsNullOrEmpty(Funcionario[i].SindicatosId.ToString()))
                                 {
                                     var taxa = Funcionario[i].TaxaSindical;
-                                    salarioHorista = salarioHorista - taxa;
+                                    salario = salario - taxa;
                                 }
 
-                                if (TaxaServicoSindical != null)
-                                {
-                                    if (TaxaServicoSindical.Count > 0)
-                                    {
-                                        for (int n = 0; n < TaxaServicoSindical.Count; n++)
-                                        {
-                                            if (TaxaServicoSindical[n].Competencia.Month == DtPagamento.Date.Value.Month)
-                                            {
-                                                salarioHorista = salarioHorista - TaxaServicoSindical[n].TaxaServico;
-                                            }
-                                        }
-
-                                    }
-                                }
-
-
-
-                                var folha = new Folha();
-                                folha.FuncionariosId = Z.FuncionariosId;
-                                folha.Nome = Z.Nome;
-                                if (Z.MetodoPagamento == 1)
-                                {
-                                    folha.MetodoPagamento = "Cheque pelos correios";
-                                }
-                                if (Z.MetodoPagamento == 2)
-                                {
-                                    folha.MetodoPagamento = "Cheque em mãos";
-                                }
-                                if (Z.MetodoPagamento == 3)
-                                {
-                                    folha.MetodoPagamento = "Deposito em conta bancária";
-                                }
-                                folha.DtPagamento = DtPagamento.Date.Value;
-                                folha.Salario = Math.Round((double)salarioHorista, 2);
-                                ListFolha.Add(folha);
+                                salario = CalcTaxaServico(TaxaServicoSindical, (double)salario, ultimoDiaDoMes, ultimoDiaDoMes.Day);
                             }
-
                         }
-
                     }
 
                     if (Funcionario[i].TipoAgenda == "Semanal") //SEMANAL
@@ -321,10 +177,8 @@ namespace ProjectP3.Forms
                         if (Funcionario[i].DiaSemana == DIASEMANA)
                         {
                             if (Funcionario[i].TipoFuncionario == 1) //ASSALARIADO
-                            {
-                                var X = Funcionario[i];
-                                double? salario = (X.Salario / ultimoDiaDoMes.Date.Day) * 7;
-
+                            {                                
+                                salario = (X.Salario / ultimoDiaDoMes.Date.Day) * 7;
 
                                 if (!string.IsNullOrEmpty(Funcionario[i].SindicatosId.ToString()))
                                 {
@@ -333,55 +187,14 @@ namespace ProjectP3.Forms
                                     salario = salario - taxasemanal;
                                 }
 
-                                if (TaxaServicoSindical != null)
-                                {
-                                    if (TaxaServicoSindical.Count > 0)
-                                    {
-                                        for (int n = 0; n < TaxaServicoSindical.Count; n++)
-                                        {
-                                            if (TaxaServicoSindical[n].Competencia.Month == DtPagamento.Date.Value.Month)
-                                            {
-                                                var taxasemanal = (TaxaServicoSindical[n].TaxaServico / ultimoDiaDoMes.Date.Day) * 7;
-
-                                                salario = salario - taxasemanal;
-                                            }
-                                        }
-
-                                    }
-                                }
-
-
-                                var folha = new Folha();
-                                folha.FuncionariosId = X.FuncionariosId;
-                                folha.Nome = X.Nome;
-                                if (X.MetodoPagamento == 1)
-                                {
-                                    folha.MetodoPagamento = "Cheque pelos correios";
-                                }
-                                if (X.MetodoPagamento == 2)
-                                {
-                                    folha.MetodoPagamento = "Cheque em mãos";
-                                }
-                                if (X.MetodoPagamento == 3)
-                                {
-                                    folha.MetodoPagamento = "Deposito em conta bancária";
-                                }
-                                folha.DtPagamento = DtPagamento.Date.Value;
-                                folha.Salario = Math.Round((double)salario, 2);
-
-                                ListFolha.Add(folha);
-
-
+                                salario = CalcTaxaServico(TaxaServicoSindical, (double)salario, ultimoDiaDoMes, 7);
                             }
 
                             if (Funcionario[i].TipoFuncionario == 2) // Comissionado
                             {
-
-                                var X = Funcionario[i];
-                                double? salario = (X.SalarioComissao / ultimoDiaDoMes.Date.Day) * 7;
+                                
+                                salario = (X.SalarioComissao / ultimoDiaDoMes.Date.Day) * 7;
                                 salario = Math.Round((double)salario, 2);
-
-
 
                                 if (!string.IsNullOrEmpty(Funcionario[i].SindicatosId.ToString()))
                                 {
@@ -390,21 +203,7 @@ namespace ProjectP3.Forms
                                     salario = salario - taxasemanal;
                                 }
 
-                                if (TaxaServicoSindical != null)
-                                {
-                                    if (TaxaServicoSindical.Count > 0)
-                                    {
-                                        for (int n = 0; n < TaxaServicoSindical.Count; n++)
-                                        {
-                                            if (TaxaServicoSindical[n].Competencia.Month == DtPagamento.Date.Value.Month)
-                                            {
-                                                var taxasemanal = (TaxaServicoSindical[n].TaxaServico / ultimoDiaDoMes.Date.Day) * 7;
-
-                                                salario = salario - taxasemanal;
-                                            }
-                                        }
-                                    }
-                                }
+                                salario = CalcTaxaServico(TaxaServicoSindical, (double)salario, ultimoDiaDoMes, 7);
 
 
                                 var vendas = await new Services<Vendas>().GetByIds("api/Vendas/Ids", Funcionario[i].FuncionariosId.ToString());
@@ -421,121 +220,30 @@ namespace ProjectP3.Forms
                                             salario += vendas[v].Comissao;
                                         }
                                     }
-                                }
-
-
-                                var folha = new Folha();
-                                folha.FuncionariosId = X.FuncionariosId;
-                                folha.Nome = X.Nome;
-                                if (X.MetodoPagamento == 1)
-                                {
-                                    folha.MetodoPagamento = "Cheque pelos correios";
-                                }
-                                if (X.MetodoPagamento == 2)
-                                {
-                                    folha.MetodoPagamento = "Cheque em mãos";
-                                }
-                                if (X.MetodoPagamento == 3)
-                                {
-                                    folha.MetodoPagamento = "Deposito em conta bancária";
-                                }
-                                folha.DtPagamento = DtPagamento.Date.Value;
-                                folha.Salario = Math.Round((double)salario, 2);
-
-                                ListFolha.Add(folha);
-
+                                }                                
                             }
 
                             if (Funcionario[i].TipoFuncionario == 3) // Horista
                             {
                                 var RegistroPontos = await new Services<RegistroPonto>().GetByIds("api/RegistroPontos/Ids", Funcionario[i].FuncionariosId.ToString());
-                                double? salarioHorista = 0;
-                                var Z = Funcionario[i];
+                                salario = 0;
 
-                                for (int j = 0; j < RegistroPontos.Count; j++)
-                                {
-                                    var Y = RegistroPontos[j];
-                                    var Day = DtPagamento.Date.Value.AddDays(-6);
+                                salario = CalcHoras(RegistroPontos, salario, X, -6, DataMes);
 
-                                    if (Y.DtPonto.Value.Date > Day.Date && Y.DtPonto.Value.Date <= DtPagamento.Date)
-                                    {
-                                        var HS = Convert.ToDateTime(Y.Horas);
-                                        TimeSpan padrao = new TimeSpan(08, 00, 00);
-
-                                        var Horas = HS.Hour;
-                                        var Minuto = HS.Minute;
-                                        var ValorMin = (HS.Minute * 1.666667) / 100;
-                                        var ValorMinu = Z.ValorHora * ValorMin;
-                                        var ValorMinConvertido = Math.Round((double)ValorMinu, 2);
-
-                                        var HoraExtra = HS.TimeOfDay - padrao; // Quantidade de Horas/Minutos Extras
-                                        var Horacalc = HoraExtra.Hours;        // Quantidade de Horas Extras
-                                        var Mincalc = (HoraExtra.Minutes * 1.666667) / 100; // Quantidade de Minutos Extras
-                                        var TaxaExtra = ((double)(Z.ValorHora * 1.5)); // Valor Taxa Extra
-                                        var Min = TaxaExtra * Mincalc; // Valor Minutos Extras
-                                        var MinExtra = Math.Round(Min, 2); // Valor Minutos Extras - Duas casas Decimais
-
-                                        if (HS.TimeOfDay > padrao)
-                                        {
-
-                                            salarioHorista += (Z.ValorHora * padrao.Hours) + (TaxaExtra * Horacalc) + MinExtra;
-                                        }
-                                        else
-                                        {
-                                            salarioHorista += (Z.ValorHora * Horas) + ValorMinConvertido;
-                                        }
-                                    }
-                                }
 
                                 if (!string.IsNullOrEmpty(Funcionario[i].SindicatosId.ToString()))
                                 {
                                     var taxa = Funcionario[i].TaxaSindical;
                                     var taxasemanal = (taxa / ultimoDiaDoMes.Date.Day) * 7;
-                                    salarioHorista = salarioHorista - taxasemanal;
+                                    salario = salario - taxasemanal;
                                 }
 
 
-                                if (TaxaServicoSindical != null)
-                                {
-                                    if (TaxaServicoSindical.Count > 0)
-                                    {
-                                        for (int n = 0; n < TaxaServicoSindical.Count; n++)
-                                        {
-                                            if (TaxaServicoSindical[n].Competencia.Month == DtPagamento.Date.Value.Month)
-                                            {
-                                                var taxasemanal = (TaxaServicoSindical[n].TaxaServico / ultimoDiaDoMes.Date.Day) * 7;
+                                 salario = CalcTaxaServico(TaxaServicoSindical, (double)salario, ultimoDiaDoMes, 7);
 
-                                                salarioHorista = salarioHorista - taxasemanal;
-                                            }
-                                        }
-
-                                    }
-                                }
-
-
-
-                                var folha = new Folha();
-                                folha.FuncionariosId = Z.FuncionariosId;
-                                folha.Nome = Z.Nome;
-                                if (Z.MetodoPagamento == 1)
-                                {
-                                    folha.MetodoPagamento = "Cheque pelos correios";
-                                }
-                                if (Z.MetodoPagamento == 2)
-                                {
-                                    folha.MetodoPagamento = "Cheque em mãos";
-                                }
-                                if (Z.MetodoPagamento == 3)
-                                {
-                                    folha.MetodoPagamento = "Deposito em conta bancária";
-                                }
-                                folha.DtPagamento = DtPagamento.Date.Value;
-                                folha.Salario = Math.Round((double)salarioHorista, 2);
-                                ListFolha.Add(folha);
                             }
                         }
                     }
-
 
 
                     bool validacao = true;
@@ -561,8 +269,7 @@ namespace ProjectP3.Forms
 
                                 if (validacao)
                                 {
-                                    var X = Funcionario[i];
-                                    double? salario = (X.Salario / ultimoDiaDoMes.Date.Day) * 14;
+                                    salario = (X.Salario / ultimoDiaDoMes.Date.Day) * 14;
 
 
                                     if (!string.IsNullOrEmpty(Funcionario[i].SindicatosId.ToString()))
@@ -572,39 +279,8 @@ namespace ProjectP3.Forms
                                         salario = salario - taxasemanal;
                                     }
 
+                                    salario = CalcTaxaServico(TaxaServicoSindical, (double)salario, ultimoDiaDoMes, 14);
 
-                                    if (TaxaServicoSindical.Count > 0)
-                                    {
-                                        for (int n = 0; n < TaxaServicoSindical.Count; n++)
-                                        {
-                                            if (TaxaServicoSindical[n].Competencia.Month == DtPagamento.Date.Value.Month)
-                                            {
-                                                var taxasemanal = (TaxaServicoSindical[n].TaxaServico / ultimoDiaDoMes.Date.Day) * 14;
-
-                                                salario = salario - taxasemanal;
-                                            }
-                                        }
-                                    }
-
-
-                                    var folha = new Folha();
-                                    folha.FuncionariosId = X.FuncionariosId;
-                                    folha.Nome = X.Nome;
-                                    if (X.MetodoPagamento == 1)
-                                    {
-                                        folha.MetodoPagamento = "Cheque pelos correios";
-                                    }
-                                    if (X.MetodoPagamento == 2)
-                                    {
-                                        folha.MetodoPagamento = "Cheque em mãos";
-                                    }
-                                    if (X.MetodoPagamento == 3)
-                                    {
-                                        folha.MetodoPagamento = "Deposito em conta bancária";
-                                    }
-                                    folha.DtPagamento = DtPagamento.Date.Value;
-                                    folha.Salario = Math.Round((double)salario, 2);
-                                    ListFolha.Add(folha);
                                 }
 
                             }
@@ -613,8 +289,7 @@ namespace ProjectP3.Forms
                             {
                                 if (validacao)
                                 {
-                                    var X = Funcionario[i];
-                                    double? salario = (X.SalarioComissao / ultimoDiaDoMes.Date.Day) * 14;
+                                    salario = (X.SalarioComissao / ultimoDiaDoMes.Date.Day) * 14;
                                     salario = Math.Round((double)salario, 2);
 
 
@@ -626,21 +301,7 @@ namespace ProjectP3.Forms
                                         salario = salario - taxasemanal;
                                     }
 
-                                    if (TaxaServicoSindical != null)
-                                    {
-                                        if (TaxaServicoSindical.Count > 0)
-                                        {
-                                            for (int n = 0; n < TaxaServicoSindical.Count; n++)
-                                            {
-                                                if (TaxaServicoSindical[n].Competencia.Month == DtPagamento.Date.Value.Month)
-                                                {
-                                                    var taxasemanal = (TaxaServicoSindical[n].TaxaServico / ultimoDiaDoMes.Date.Day) * 14;
-
-                                                    salario = salario - taxasemanal;
-                                                }
-                                            }
-                                        }
-                                    }
+                                    salario = CalcTaxaServico(TaxaServicoSindical, (double)salario, ultimoDiaDoMes, 14);
 
 
                                     var vendas = await new Services<Vendas>().GetByIds("api/Vendas/Ids", Funcionario[i].FuncionariosId.ToString());
@@ -658,33 +319,7 @@ namespace ProjectP3.Forms
                                             }
                                         }
                                     }
-
-
-                                    var folha = new Folha();
-                                    folha.FuncionariosId = X.FuncionariosId;
-                                    folha.Nome = X.Nome;
-                                    if (X.MetodoPagamento == 1)
-                                    {
-                                        folha.MetodoPagamento = "Cheque pelos correios";
-                                    }
-                                    if (X.MetodoPagamento == 2)
-                                    {
-                                        folha.MetodoPagamento = "Cheque em mãos";
-                                    }
-                                    if (X.MetodoPagamento == 3)
-                                    {
-                                        folha.MetodoPagamento = "Deposito em conta bancária";
-                                    }
-                                    folha.DtPagamento = DtPagamento.Date.Value;
-                                    folha.Salario = Math.Round((double)salario, 2);
-
-                                    ListFolha.Add(folha);
                                 }
-
-
-
-
-
                             }
 
                             if (Funcionario[i].TipoFuncionario == 3) //Horista
@@ -692,107 +327,35 @@ namespace ProjectP3.Forms
                                 if (validacao)
                                 {
                                     var RegistroPontos = await new Services<RegistroPonto>().GetByIds("api/RegistroPontos/Ids", Funcionario[i].FuncionariosId.ToString());
-                                    double? salarioHorista = 0;
-                                    var Z = Funcionario[i];
+                                    salario = 0;
 
-                                    for (int j = 0; j < RegistroPontos.Count; j++)
-                                    {
-                                        var Y = RegistroPontos[j];
-                                        var Day = DtPagamento.Date.Value.AddDays(-13);
-
-                                        if (Y.DtPonto.Value.Date > Day.Date && Y.DtPonto.Value.Date <= DtPagamento.Date)
-                                        {
-                                            var HS = Convert.ToDateTime(Y.Horas);
-                                            TimeSpan padrao = new TimeSpan(08, 00, 00);
-
-                                            var Horas = HS.Hour;
-                                            var Minuto = HS.Minute;
-                                            var ValorMin = (HS.Minute * 1.666667) / 100;
-                                            var ValorMinu = Z.ValorHora * ValorMin;
-                                            var ValorMinConvertido = Math.Round((double)ValorMinu, 2);
-
-                                            var HoraExtra = HS.TimeOfDay - padrao; // Quantidade de Horas/Minutos Extras
-                                            var Horacalc = HoraExtra.Hours;        // Quantidade de Horas Extras
-                                            var Mincalc = (HoraExtra.Minutes * 1.666667) / 100; // Quantidade de Minutos Extras
-                                            var TaxaExtra = ((double)(Z.ValorHora * 1.5)); // Valor Taxa Extra
-                                            var Min = TaxaExtra * Mincalc; // Valor Minutos Extras
-                                            var MinExtra = Math.Round(Min, 2); // Valor Minutos Extras - Duas casas Decimais
-
-                                            if (HS.TimeOfDay > padrao)
-                                            {
-
-                                                salarioHorista += (Z.ValorHora * padrao.Hours) + (TaxaExtra * Horacalc) + MinExtra;
-                                            }
-                                            else
-                                            {
-                                                salarioHorista += (Z.ValorHora * Horas) + ValorMinConvertido;
-                                            }
-                                        }
-                                    }
+                                    salario = CalcHoras(RegistroPontos, salario, X, -13, DataMes);
 
                                     if (!string.IsNullOrEmpty(Funcionario[i].SindicatosId.ToString()))
                                     {
                                         var taxa = Funcionario[i].TaxaSindical;
                                         var taxasemanal = (taxa / ultimoDiaDoMes.Date.Day) * 14;
-                                        salarioHorista = salarioHorista - taxasemanal;
+                                        salario = salario - taxasemanal;
                                     }
-
-
-                                    if (TaxaServicoSindical != null)
-                                    {
-                                        if (TaxaServicoSindical.Count > 0)
-                                        {
-                                            for (int n = 0; n < TaxaServicoSindical.Count; n++)
-                                            {
-                                                if (TaxaServicoSindical[n].Competencia.Month == DtPagamento.Date.Value.Month)
-                                                {
-                                                    var taxasemanal = (TaxaServicoSindical[n].TaxaServico / ultimoDiaDoMes.Date.Day) * 14;
-
-                                                    salarioHorista = salarioHorista - taxasemanal;
-                                                }
-                                            }
-
-                                        }
-                                    }
-
-
-
-                                    var folha = new Folha();
-                                    folha.FuncionariosId = Z.FuncionariosId;
-                                    folha.Nome = Z.Nome;
-                                    if (Z.MetodoPagamento == 1)
-                                    {
-                                        folha.MetodoPagamento = "Cheque pelos correios";
-                                    }
-                                    if (Z.MetodoPagamento == 2)
-                                    {
-                                        folha.MetodoPagamento = "Cheque em mãos";
-                                    }
-                                    if (Z.MetodoPagamento == 3)
-                                    {
-                                        folha.MetodoPagamento = "Deposito em conta bancária";
-                                    }
-                                    folha.DtPagamento = DtPagamento.Date.Value;
-                                    folha.Salario = Math.Round((double)salarioHorista, 2);
-                                    ListFolha.Add(folha);
-
+                                    salario = CalcTaxaServico(TaxaServicoSindical, (double)salario, ultimoDiaDoMes, 14);
                                 }
                             }
 
-                        }
+                        }                        
                     }
-
-                    GridFolha.LoadFromList(ListFolha);
-
-
+                    if (salario != 0)
+                    {
+                        AgruparFolha(X, (double)salario);
+                    }                   
                 }
+
+                GridFolha.LoadFromList(ListFolha);
 
                 if (ListFolha.Count == 0)
                 {
                     MessageBox.Show("Nenhum pagamento para esta data");
                 }
             }
-
             catch (Exception M)
             {
                 MessageBox.Show(M.Message);
@@ -801,7 +364,91 @@ namespace ProjectP3.Forms
             {
                 unfreeze();
             }
+        }
 
+        public void AgruparFolha(FuncionarioVw X, double Salario)
+        {
+            var folha = new Folha();
+            folha.FuncionariosId = X.FuncionariosId;
+            folha.Nome = X.Nome;
+            if (X.MetodoPagamento == 1)
+            {
+                folha.MetodoPagamento = "Cheque pelos correios";
+            }
+            if (X.MetodoPagamento == 2)
+            {
+                folha.MetodoPagamento = "Cheque em mãos";
+            }
+            if (X.MetodoPagamento == 3)
+            {
+                folha.MetodoPagamento = "Deposito em conta bancária";
+            }
+            folha.DtPagamento = DtPagamento.Date.Value;
+            folha.Salario = Math.Round((double)Salario, 2);
+            ListFolha.Add(folha);
+        }
+
+        public double CalcTaxaServico(List<TaxasServico> TaxaServicoSindical, double salario, DateTime ultimoDiaDoMes, int Condicao)
+        {
+            if (TaxaServicoSindical != null)
+            {
+                if (TaxaServicoSindical.Count > 0)
+                {
+                    for (int n = 0; n < TaxaServicoSindical.Count; n++)
+                    {
+                        if (TaxaServicoSindical[n].Competencia.Month == DtPagamento.Date.Value.Month)
+                        {
+                            var taxasemanal = (TaxaServicoSindical[n].TaxaServico / ultimoDiaDoMes.Date.Day) * Condicao;
+
+                            salario = salario - taxasemanal;
+                        }
+                    }
+                    return salario;
+                }
+            }
+            return salario;
+        }
+
+        public double CalcHoras(List<RegistroPonto> RegistroPontos, double? salario, FuncionarioVw X, double dias, DateTime DataMes)
+        {
+            for (int j = 0; j < RegistroPontos.Count; j++)
+            {
+                var Y = RegistroPontos[j];
+                var Day = DtPagamento.Date.Value.AddDays(dias);
+                if (dias == 0)
+                {
+                    Day = DataMes.Date;
+                }
+                if (Y.DtPonto.Value.Date > Day.Date && Y.DtPonto.Value.Date <= DtPagamento.Date)
+                {
+                    var HS = Convert.ToDateTime(Y.Horas);
+                    TimeSpan padrao = new TimeSpan(08, 00, 00);
+
+                    var Horas = HS.Hour;
+                    var Minuto = HS.Minute;
+                    var ValorMin = (HS.Minute * 1.666667) / 100;
+                    var ValorMinu = X.ValorHora * ValorMin;
+                    var ValorMinConvertido = Math.Round((double)ValorMinu, 2);
+
+                    var HoraExtra = HS.TimeOfDay - padrao; // Quantidade de Horas/Minutos Extras
+                    var Horacalc = HoraExtra.Hours;        // Quantidade de Horas Extras
+                    var Mincalc = (HoraExtra.Minutes * 1.666667) / 100; // Quantidade de Minutos Extras
+                    var TaxaExtra = ((double)(X.ValorHora * 1.5)); // Valor Taxa Extra
+                    var Min = TaxaExtra * Mincalc; // Valor Minutos Extras
+                    var MinExtra = Math.Round(Min, 2); // Valor Minutos Extras - Duas casas Decimais
+
+                    if (HS.TimeOfDay > padrao)
+                    {
+
+                        salario += (X.ValorHora * padrao.Hours) + (TaxaExtra * Horacalc) + MinExtra;
+                    }
+                    else
+                    {
+                        salario += (X.ValorHora * Horas) + ValorMinConvertido;
+                    }
+                }
+            }
+            return (double)salario;
         }
 
         private async void btnSalvar_Click(object sender, EventArgs e)

@@ -50,14 +50,10 @@
   <ItemGroup>
     <Compile Include="Models\AgendaPagamento.cs" />
     <Compile Include="Models\Assalariado.cs" />
-    <Compile Include="Models\Command\ConsultaComissionado.cs" />
-    <Compile Include="Models\Command\ConsultaFuncionario.cs" />
-    <Compile Include="Models\Command\ConsultaHorista.cs" />
     <Compile Include="Models\Folha.cs" />
     <Compile Include="Models\FolhaEspelho.cs" />
     <Compile Include="Models\FuncionarioSindical.cs" />
     <Compile Include="Models\FuncionarioVw.cs" />
-    <Compile Include="Models\Command\IConsultaFuncionario.cs" />
     <Compile Include="Models\RegistroPonto.cs" />
     <Compile Include="Models\Cheque.cs" />
     <Compile Include="Models\Comissionado.cs" />

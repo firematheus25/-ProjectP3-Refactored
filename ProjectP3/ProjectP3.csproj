@@ -149,6 +149,10 @@
     <Compile Include="Forms\FormVendas.Designer.cs">
       <DependentUpon>FormVendas.cs</DependentUpon>
     </Compile>
+    <Compile Include="Services\Command\ConsultaComissionado.cs" />
+    <Compile Include="Services\Command\ConsultaFuncionario.cs" />
+    <Compile Include="Services\Command\ConsultaHorista.cs" />
+    <Compile Include="Services\Command\IConsultaFuncionario.cs" />
     <Compile Include="Services\MyClient.cs" />
     <Compile Include="Services\Services.cs" />
     <EmbeddedResource Include="Forms\FormAgendaPagamento.resx">

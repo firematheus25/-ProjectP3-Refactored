@@ -7,14 +7,14 @@ namespace ProjectP3.componentes
     [System.ComponentModel.DesignerCategory("Code")]
     public class CmpNumerico : TextBox
     {
-        private decimal? _Valor;
+        private double? _Valor;
         private int _CasasDecimais = 2;
-        private decimal _ValorMaximo = 999999999;
+        private double _ValorMaximo = 999999999;
         private bool foco = false;
         private bool cod = false;
 
         [Browsable(false)]
-        public decimal? Valor
+        public double? Valor
         {
             get { return _Valor; }
             set
@@ -53,8 +53,8 @@ namespace ProjectP3.componentes
 
         public decimal ValorMaximo
         {
-            get { return _ValorMaximo; }
-            set { this._ValorMaximo = value; }
+            get { return (decimal)_ValorMaximo; }
+            set { this._ValorMaximo = (double)value; }
         }
 
         public CmpNumerico()
@@ -131,7 +131,7 @@ namespace ProjectP3.componentes
                     try
                     {
                         cod = true;
-                        this.Valor = decimal.Parse(this.Text);
+                        this.Valor = double.Parse(this.Text);
                     }
                     catch
                     {
@@ -165,7 +165,7 @@ namespace ProjectP3.componentes
             {
                 if (this.Text != "")
                 {
-                    this.Valor = decimal.Parse(this.Text);
+                    this.Valor = double.Parse(this.Text);
                 }
                 else
                 {

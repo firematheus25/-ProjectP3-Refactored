@@ -93,7 +93,7 @@ namespace ProjectP3
                 FuncionariosId.TxtCodigo.Text = Convert.ToString(venda.FuncionariosId);
                 FuncionariosId.TxtDescricao.Text = venda.Nome;
                 DtVenda.Date = venda.DtVenda;
-                ValorVenda.Text = Convert.ToString(venda.ValorVenda);
+                ValorVenda.Text = venda.ValorVenda.ToString();
                 PorcentagemVenda.Text = Convert.ToString(venda.Porcentagem);
                 Comissao.Text = Convert.ToString(venda.Comissao);
 
@@ -127,7 +127,7 @@ namespace ProjectP3
                     Vendas.FuncionariosId = Convert.ToInt32(FuncionariosId.TxtCodigo.Text);
                     Vendas.Nome = FuncionariosId.TxtDescricao.Text;
                     Vendas.DtVenda = DtVenda.Date.Value;
-                    Vendas.ValorVenda = (double?)ValorVenda.Valor;
+                    Vendas.ValorVenda = (double)ValorVenda.Valor;
                     Vendas.Porcentagem = (double?)PorcentagemVenda.Valor;
                     Vendas.Comissao = (double?)Comissao.Valor;
 
@@ -173,8 +173,11 @@ namespace ProjectP3
 
         private void FuncionariosId_ConsultarClick(object sender, EventArgs e)
         {
+            var Func = new ConsultaFuncionario();
+            var comissionado = new ConsultaComissionado(Func);
             var frmConsulta = new FuncionariosConsulta();
             frmConsulta.Owner = this;
+            frmConsulta.setcommand(comissionado);
             frmConsulta.ShowDialog();
         }
 
@@ -189,7 +192,7 @@ namespace ProjectP3
                     Comissao.Clear();
                 }
                 var valorcomissao = Convert.ToDouble(PorcentagemVenda.Text) / 100;
-                Comissao.Valor = (decimal?)(Convert.ToDouble(ValorVenda.Text) * valorcomissao);
+                Comissao.Valor = (Convert.ToDouble(ValorVenda.Text) * valorcomissao);
             }
             catch (Exception M)
             {

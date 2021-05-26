@@ -208,8 +208,11 @@ namespace ProjectP3
 
         private void FuncionariosId_ConsultarClick(object sender, EventArgs e)
         {
+            var Func = new ConsultaFuncionario();
+            var horista = new ConsultaHorista(Func);
             var frmConsulta = new FuncionariosConsulta();
-            frmConsulta.Owner = this;
+            frmConsulta.setcommand(horista);
+            frmConsulta.Owner = this;           
             frmConsulta.ShowDialog();
         }
 

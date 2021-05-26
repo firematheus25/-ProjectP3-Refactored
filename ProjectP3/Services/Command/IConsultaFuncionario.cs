@@ -1,13 +1,14 @@
-﻿using System;
+﻿using miscellaneous.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace miscellaneous.Models
+namespace ProjectP3.Services
 {
     public interface IConsultaFuncionario
     {
-         void Executar();
+        Task<List<Funcionario>> Executar();
     }
 }
