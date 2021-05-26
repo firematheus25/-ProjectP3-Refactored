@@ -1,8 +1,3 @@
-#### Disciplina: Projeto de Software
-#### Aluno: Wilamis Micael de Araujo Aviz
-#### Professor: Baldoino Fonseca dos Santos Neto.
-#### Projeto em Java com OO para a disciplina de Projeto de Software no semestre 2020.1
-
 # Sistema de Folha de pagamentos
 O objetivo do projeto é construir um sistema de folha de pagamento. O sistema consiste de um banco de dados de empregados de uma empresa além dos seus dados associados tais como cartões de ponto. O sistema deve pagar cada empregado. Empregados devem receber o salário correto, no momento correto, usando o método que eles preferem. Além do mais, várias taxas e impostos são deduzidos do seu salário.
 
@@ -37,23 +32,16 @@ O objetivo do projeto é construir um sistema de folha de pagamento. O sistema c
 
 # Code Smell
 * Duplicated Code
-* Long Parameter List
-* Long Method
-* Large Class
-* Shotgun Surgery
-* Indecent Exposure
 
 # Refatoramento
 
+### Extract Method
+Utilizado no evento GerarFolha_Click no FormFolha.cs, criando dois novos métodos, "CalcHoras" e "CalcTaxaServico". Alteração pode ser vista [Aqui](https://github.com/firematheus25/ProjectP3-Refactored/commit/1007299aec76dffada60b6ca5c1ddfb31ac00e35) em ProjectP3/Forms/FormFolha.cs
+
+### Extract Method + Consolidate Duplicate Conditional Fragments
+Utilizado no Evento GerarFolha_Click no FormFolha.cs, criando um novo método "AgruparFolha",  e retirando-o de todos os condicionais, sendo realizada somente uma chamada, no final de todo o processo de geração de Folha. [Aqui](https://github.com/firematheus25/ProjectP3-Refactored/commit/1007299aec76dffada60b6ca5c1ddfb31ac00e35) em ProjectP3/Forms/FormFolha.cs
+
 ### Command
-Foi utilizado o padrão de projeto Command para evitar de usar if/else ou switch/case nos menus do programa. Todos os menus estão no padrão Command. Foi criada uma interface de menu para executar o comando de acordo com o menu vigente. As mudanças estão no commit [59475bc](https://github.com/WilamisAviz15/PayrollRefactoring/commit/59475bc63956216cab9712ebe1575ed7c41ff7d1)
+Foi utilizado o padrão de projeto Command para evitar de usar if/else no Form FuncionariosConsulta no Evento FormConsulta_Load. As mudanças estão [Aqui](https://github.com/firematheus25/ProjectP3-Refactored/commit/1007299aec76dffada60b6ca5c1ddfb31ac00e35) em ProjectP3/Forms/FormConsulta/FuncionariosConsulta.cs
 
-### Introduce Parameter Object
-Em todas as funções eram passadas as pilhas de UNDO e REDO. Foi criado um objeto que contia ambas as pilhas evitando parametros desnecessários. Alteração pode ser vista no commit: [b5e5a09](https://github.com/WilamisAviz15/PayrollRefactoring/commit/b5e5a0986767729fe53756865af72b7bc743a384)
 
-### Move Accumulation to Collecting Parameter
-Na Classe Employee.java havia uma verificação dentro do toString() para saber se o empregado pertencia ao sindicato ou não, onde havia uma concatenação de string de acordo com a resposta obtida do if. Foi criado o método infoSyndicateConcat() e adicionado ao toString. A alteração está no commit [ce0395c](https://github.com/WilamisAviz15/PayrollRefactoring/commit/ce0395c92e0bbfccf13b4a0d1495cb9e83f54f60)
-
-### Removing Generative Speculation
-Foram removidos construtores, métodos e imports não utilizados em todo o code. As remoções estão aqui: 
-[b8695c6](https://github.com/WilamisAviz15/PayrollRefactoring/commit/b8695c60fed6ace15b6f905799df04e04261be42)
