@@ -44,6 +44,8 @@ namespace ProjectP3
             Saida.Value = DateTimePicker.MinimumDateTime;
             Horas.Clear();
             btn_Excluir.Visible = false;
+            FuncionariosId.Enabled = true;
+            FuncionariosId.TxtCodigo.Enabled = false;
         }
 
         public override bool validacoes()
