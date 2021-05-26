@@ -39,7 +39,7 @@ O objetivo do projeto é construir um sistema de folha de pagamento. O sistema c
 Utilizado no evento GerarFolha_Click no FormFolha.cs, criando dois novos métodos, "CalcHoras" e "CalcTaxaServico". Alteração pode ser vista [Aqui](https://github.com/firematheus25/ProjectP3-Refactored/commit/1007299aec76dffada60b6ca5c1ddfb31ac00e35) em ProjectP3/Forms/FormFolha.cs
 
 ### Extract Method + Consolidate Duplicate Conditional Fragments
-Utilizado no Evento GerarFolha_Click no FormFolha.cs, criando um novo método "AgruparFolha",  e retirando-o de todos os condicionais, sendo realizada somente uma chamada, no final de todo o processo de geração de Folha. [Aqui](https://github.com/firematheus25/ProjectP3-Refactored/commit/1007299aec76dffada60b6ca5c1ddfb31ac00e35) em ProjectP3/Forms/FormFolha.cs
+Utilizado no Evento GerarFolha_Click no FormFolha.cs, criando um novo método "AgruparFolha",  e retirando-o de todos os condicionais, sendo realizada somente uma chamada, no final de todo o processo de geração de Folha. Alteração pode ser vista [Aqui](https://github.com/firematheus25/ProjectP3-Refactored/commit/1007299aec76dffada60b6ca5c1ddfb31ac00e35) em ProjectP3/Forms/FormFolha.cs
 
 ### Command
 Foi utilizado o padrão de projeto Command para evitar de usar if/else no Form FuncionariosConsulta no Evento FormConsulta_Load. As mudanças estão [Aqui](https://github.com/firematheus25/ProjectP3-Refactored/commit/1007299aec76dffada60b6ca5c1ddfb31ac00e35) em ProjectP3/Forms/FormConsulta/FuncionariosConsulta.cs
